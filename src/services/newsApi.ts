@@ -12,6 +12,11 @@ interface AllNewsRequestParams {
   dateTo: string;
 }
 
+interface TopHeadlinesRequestParams {
+  searchText: string;
+  category: string;
+}
+
 export async function getAllNewsFromNewsApi({
   searchText,
   dateFrom,
@@ -34,13 +39,19 @@ export async function getAllNewsFromNewsApi({
   return response.json() as Promise<NewsApiResponse>;
 }
 
-export async function getTopHeadlinesFromNewsApi(): Promise<NewsApiResponse> {
-  const response = await fetch(`/top-headlines?country=us&page=1&pageSize=5`, {
-    headers: {
-      method: 'GET',
-      Authorization: `Bearer ${NEWS_API_API_KEY}`,
-    },
-  });
+export async function getTopHeadlinesFromNewsApi({
+  searchText,
+  category,
+}: TopHeadlinesRequestParams): Promise<NewsApiResponse> {
+  const response = await fetch(
+    `/top-headlines?country=us&q=${searchText}&category=${category}&page=1&pageSize=5`,
+    {
+      headers: {
+        method: 'GET',
+        Authorization: `Bearer ${NEWS_API_API_KEY}`,
+      },
+    }
+  );
 
   if (!response.ok) {
     throw new Error('Failed to fetch top headlines from News API');

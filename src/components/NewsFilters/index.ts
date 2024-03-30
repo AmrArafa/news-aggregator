@@ -1,1 +1,2 @@
-export * from './NewsFilters';
+export * from './DateFilter';
+export * from './CategoryFilter';

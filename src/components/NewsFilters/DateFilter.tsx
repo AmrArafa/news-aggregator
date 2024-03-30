@@ -1,6 +1,6 @@
 import type { ChangeEvent, ReactElement } from 'react';
 
-interface NewsFiltersProps {
+interface DateFilterProps {
   dateFrom: string;
   setDateFrom: (dateFrom: string) => void;
   dateTo: string;
@@ -9,14 +9,14 @@ interface NewsFiltersProps {
   defaultDateTo: string;
 }
 
-export function NewsFilters({
+export function DateFilter({
   dateFrom,
   setDateFrom,
   dateTo,
   setDateTo,
   defaultDateFrom,
   defaultDateTo,
-}: NewsFiltersProps): ReactElement {
+}: DateFilterProps): ReactElement {
   function handleDateFromChange(event: ChangeEvent<HTMLInputElement>): void {
     setDateFrom(event.target.value);
   }

@@ -16,7 +16,7 @@ export function NewsSearch({
   return (
     <form className="flex mt-4">
       <input
-        type="text"
+        type="search"
         placeholder="Search news..."
         onChange={handleSearchTextChange}
         value={searchText}
