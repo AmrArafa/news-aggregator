@@ -1,4 +1,4 @@
-import type { NewsApiArticle } from '../models/newsApi';
+import type { NewsApiArticle } from '../../models/newsApi';
 
 export function NewsCard({
   article,
@@ -18,7 +18,8 @@ export function NewsCard({
           <h2 className="text-lg font-semibold">{title}</h2>
           <p className="text-gray-500 mt-2">{description}</p>
           <p className="text-sm text-gray-400 mt-4 italic">
-            Source: {source.name}
+            <span className="block">Source: {source.name}</span>
+            <span>Date Published: {article.publishedAt.split('T')[0]}</span>
           </p>
         </div>
       </a>
