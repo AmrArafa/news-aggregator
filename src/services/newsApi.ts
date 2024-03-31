@@ -10,6 +10,7 @@ interface AllNewsRequestParams {
   searchText: string;
   dateFrom: string;
   dateTo: string;
+  sources: string;
 }
 
 interface TopHeadlinesRequestParams {
@@ -21,9 +22,10 @@ export async function getAllNewsFromNewsApi({
   searchText,
   dateFrom,
   dateTo,
+  sources,
 }: AllNewsRequestParams): Promise<NewsApiResponse> {
   const response = await fetch(
-    `/everything?q=${searchText}&from=${dateFrom}&to=${dateTo}&language=en&page=1&pageSize=5`,
+    `/everything?q=${searchText}&from=${dateFrom}&to=${dateTo}&sources=${sources}&language=en&page=1&pageSize=5`,
     {
       headers: {
         method: 'GET',
@@ -55,6 +57,21 @@ export async function getTopHeadlinesFromNewsApi({
 
   if (!response.ok) {
     throw new Error('Failed to fetch top headlines from News API');
+  }
+
+  return response.json() as Promise<NewsApiResponse>;
+}
+
+export async function getSourcesFromNewsApi(): Promise<NewsApiResponse> {
+  const response = await fetch('/top-headlines/sources', {
+    headers: {
+      method: 'GET',
+      Authorization: `Bearer ${NEWS_API_API_KEY}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch sources from News API');
   }
 
   return response.json() as Promise<NewsApiResponse>;

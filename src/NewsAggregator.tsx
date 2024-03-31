@@ -7,7 +7,11 @@ import {
 } from './services/newsApi';
 import { NewsCard } from './components/NewsCard';
 import { NewsSearch } from './components/NewsSearch';
-import { DateFilter, CategoryFilter } from './components/NewsFilters';
+import {
+  DateFilter,
+  CategoryFilter,
+  SourceFilter,
+} from './components/NewsFilters';
 import { getDefaultDateFrom, getDefaultDateTo } from './utils/dateUtils';
 
 export function NewsAggregator(): ReactElement {
@@ -18,19 +22,33 @@ export function NewsAggregator(): ReactElement {
   const [dateFrom, setDateFrom] = useState(defaultDateFrom);
   const [dateTo, setDateTo] = useState(defaultDateTo);
   const [category, setCategory] = useState('');
+  const [selectedSourceIds, setSelectedSourceIds] = useState<string[]>([]);
+  const [selectedSourceNames, setSelectedSourceNames] = useState<string[]>([]);
 
   const debouncedSearchText = useDebounce(searchText, 500);
 
+  const canFetchAllArticles =
+    dateFrom !== '' && dateTo !== '' && debouncedSearchText !== '';
+
+  const canFetchTopHeadlines = selectedSourceIds.length === 0;
+
   const { data: allArticles, isFetching: isFetchingAllArticles } = useQuery({
-    queryKey: ['newsApiNews', debouncedSearchText, dateFrom, dateTo],
+    queryKey: [
+      'newsApiNews',
+      debouncedSearchText,
+      dateFrom,
+      dateTo,
+      selectedSourceIds,
+    ],
     queryFn: () =>
       getAllNewsFromNewsApi({
         searchText: debouncedSearchText,
         dateFrom,
         dateTo,
+        sources: selectedSourceIds.join(','),
       }),
     select: (data) => data.articles,
-    enabled: dateFrom !== '' && dateTo !== '' && debouncedSearchText !== '',
+    enabled: canFetchAllArticles,
     refetchOnWindowFocus: false,
   });
 
@@ -39,6 +57,7 @@ export function NewsAggregator(): ReactElement {
     queryFn: () =>
       getTopHeadlinesFromNewsApi({ searchText: debouncedSearchText, category }),
     select: (data) => data.articles,
+    enabled: canFetchTopHeadlines,
     refetchOnWindowFocus: false,
   });
 
@@ -57,7 +76,14 @@ export function NewsAggregator(): ReactElement {
         defaultDateTo={defaultDateTo}
       />
       <CategoryFilter setCategory={setCategory} />
-      {isLoading && <p className="text-lg text-center mt-4">Loading...</p>}
+      <SourceFilter
+        selectedSourceNames={selectedSourceNames}
+        setSelectedSourceNames={setSelectedSourceNames}
+        selectedSourceIds={selectedSourceIds}
+        setSelectedSourceIds={setSelectedSourceIds}
+        searchText={searchText}
+      />
+      {isLoading && <p className="text-lg text-center mt-4">Loading news...</p>}
       {!isLoading &&
         allArticles?.length === 0 &&
         topHeadlines?.length === 0 && (
@@ -68,16 +94,18 @@ export function NewsAggregator(): ReactElement {
         )}
       {!isLoading && allArticles && (
         <div className="mt-5 grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {allArticles.map((article) => (
-            <NewsCard key={article.title} article={article} />
-          ))}
+          {allArticles.map((article) => {
+            if (article.title === '[Removed]') return null;
+            return <NewsCard key={article.title} article={article} />;
+          })}
         </div>
       )}
       {!isLoading && topHeadlines && (
         <div className="mt-5 grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {topHeadlines.map((article) => (
-            <NewsCard key={article.title} article={article} />
-          ))}
+          {topHeadlines.map((article) => {
+            if (article.title === '[Removed]') return null;
+            return <NewsCard key={article.title} article={article} />;
+          })}
         </div>
       )}
     </div>
