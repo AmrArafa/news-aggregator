@@ -17,7 +17,12 @@ export function SourceFilter({
   setSelectedSourceIds,
   searchText,
 }: SourceFilterProps): ReactElement {
-  const { data: sources, isFetching: isFetchingSources } = useQuery({
+  const {
+    data: sources,
+    isFetching: isFetchingSources,
+    isError: isSourcesError,
+    error: sourcesError,
+  } = useQuery({
     queryKey: ['newsApiSources'],
     queryFn: () => getSourcesFromNewsApi(),
     select: (data) => data.sources,
@@ -47,6 +52,11 @@ export function SourceFilter({
     <>
       {isFetchingSources && (
         <p className="text-lg text-center mt-4">Getting sources...</p>
+      )}
+      {isSourcesError && (
+        <p className="text-lg text-center mt-4 text-red-500">
+          Error: {sourcesError.message}
+        </p>
       )}
       {!isFetchingSources && sources && (
         <div className="mt-4">

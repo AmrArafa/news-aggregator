@@ -25,7 +25,7 @@ export async function getAllNewsFromNewsApi({
   sources,
 }: AllNewsRequestParams): Promise<NewsApiResponse> {
   const response = await fetch(
-    `/everything?q=${searchText}&from=${dateFrom}&to=${dateTo}&sources=${sources}&language=en&page=1&pageSize=5`,
+    `/everything?q=${searchText}&from=${dateFrom}&to=${dateTo}&sources=${sources}&language=en&page=1&pageSize=10`,
     {
       headers: {
         method: 'GET',
@@ -35,7 +35,7 @@ export async function getAllNewsFromNewsApi({
   );
 
   if (!response.ok) {
-    throw new Error('Failed to fetch news from News API');
+    throw new Error('failed to fetch news from News API');
   }
 
   return response.json() as Promise<NewsApiResponse>;
@@ -46,7 +46,7 @@ export async function getTopHeadlinesFromNewsApi({
   category,
 }: TopHeadlinesRequestParams): Promise<NewsApiResponse> {
   const response = await fetch(
-    `/top-headlines?country=us&q=${searchText}&category=${category}&page=1&pageSize=5`,
+    `/top-headlines?country=us&q=${searchText}&category=${category}&page=1&pageSize=10`,
     {
       headers: {
         method: 'GET',
@@ -56,7 +56,7 @@ export async function getTopHeadlinesFromNewsApi({
   );
 
   if (!response.ok) {
-    throw new Error('Failed to fetch top headlines from News API');
+    throw new Error('failed to fetch top headlines from News API');
   }
 
   return response.json() as Promise<NewsApiResponse>;
@@ -71,7 +71,7 @@ export async function getSourcesFromNewsApi(): Promise<NewsApiResponse> {
   });
 
   if (!response.ok) {
-    throw new Error('Failed to fetch sources from News API');
+    throw new Error('failed to fetch sources from News API');
   }
 
   return response.json() as Promise<NewsApiResponse>;

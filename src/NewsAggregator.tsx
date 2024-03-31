@@ -32,7 +32,12 @@ export function NewsAggregator(): ReactElement {
 
   const canFetchTopHeadlines = selectedSourceIds.length === 0;
 
-  const { data: allArticles, isFetching: isFetchingAllArticles } = useQuery({
+  const {
+    data: allArticles,
+    isFetching: isFetchingAllArticles,
+    isError: isArticlesError,
+    error: articlesError,
+  } = useQuery({
     queryKey: [
       'newsApiNews',
       debouncedSearchText,
@@ -52,7 +57,12 @@ export function NewsAggregator(): ReactElement {
     refetchOnWindowFocus: false,
   });
 
-  const { data: topHeadlines, isFetching: isFetchingTopHeadlines } = useQuery({
+  const {
+    data: topHeadlines,
+    isFetching: isFetchingTopHeadlines,
+    isError: isTopHeadlinesError,
+    error: topHeadlinesError,
+  } = useQuery({
     queryKey: ['newsApiTopHeadlines', debouncedSearchText, category],
     queryFn: () =>
       getTopHeadlinesFromNewsApi({ searchText: debouncedSearchText, category }),
@@ -62,6 +72,21 @@ export function NewsAggregator(): ReactElement {
   });
 
   const isLoading = isFetchingAllArticles || isFetchingTopHeadlines;
+
+  const isEmpty =
+    !isLoading &&
+    allArticles?.length === 0 &&
+    (topHeadlines?.length === 0 || selectedSourceIds.length > 0);
+
+  const canShowArticles =
+    !isLoading && !isEmpty && allArticles && !isArticlesError;
+
+  const canShowHeadlines =
+    !isLoading &&
+    !isEmpty &&
+    topHeadlines &&
+    selectedSourceIds.length === 0 &&
+    !isTopHeadlinesError;
 
   return (
     <div className="p-5">
@@ -84,15 +109,23 @@ export function NewsAggregator(): ReactElement {
         searchText={searchText}
       />
       {isLoading && <p className="text-lg text-center mt-4">Loading news...</p>}
-      {!isLoading &&
-        allArticles?.length === 0 &&
-        topHeadlines?.length === 0 && (
-          <p className="text-lg text-center mt-4">
-            No articles found. Please try different filters or use different
-            keywords in search.
-          </p>
-        )}
-      {!isLoading && allArticles && (
+      {isArticlesError && (
+        <p className="text-lg text-red-500 text-center mt-4">
+          Error: {articlesError.message}
+        </p>
+      )}
+      {isTopHeadlinesError && (
+        <p className="text-lg text-red-500 text-center mt-4">
+          Error: {topHeadlinesError.message}
+        </p>
+      )}
+      {isEmpty && (
+        <p className="text-lg text-center mt-4">
+          No articles found. Please try different filters or use different
+          keywords in search.
+        </p>
+      )}
+      {canShowArticles && (
         <div className="mt-5 grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {allArticles.map((article) => {
             if (article.title === '[Removed]') return null;
@@ -100,7 +133,7 @@ export function NewsAggregator(): ReactElement {
           })}
         </div>
       )}
-      {!isLoading && topHeadlines && (
+      {canShowHeadlines && (
         <div className="mt-5 grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {topHeadlines.map((article) => {
             if (article.title === '[Removed]') return null;
