@@ -28,3 +28,16 @@ export default {
 - Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
 - Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
 - Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+
+## Running the project within a docker container
+
+- Make sure that you have the [docker engine](https://docs.docker.com/engine/install/) installed on your machine, and running in the background
+- Run the `docker` command in your terminal after installation to make sure that it's working
+- Go to the project's root directory and run `docker compose up`
+- It will take a few seconds to build the docker image and run the container
+- If everything works correctly you will see on your terminal that the project is running on `http://localhost:5173/`
+- If running the project using docker fails, follow the next steps
+- Make sure you have node `v20.11.1` installed
+- Go to the project's root directory and run `npm install`
+- After all packages are installed, run `npm run dev`
+- Finally, you will see on your terminal that the project is running on `http://localhost:5173/`

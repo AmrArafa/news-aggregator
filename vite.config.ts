@@ -8,6 +8,7 @@ export default defineConfig({
       '/everything': 'https://newsapi.org/v2',
       '/top-headlines': 'https://newsapi.org/v2',
     },
+    host: true,
   },
   plugins: [react()],
 });
