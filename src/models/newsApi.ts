@@ -30,3 +30,14 @@ export interface NewsApiResponse {
   sources?: NewsApiSource[];
   totalResults?: number;
 }
+
+export type Category =
+  | 'general'
+  | 'business'
+  | 'entertainment'
+  | 'health'
+  | 'science'
+  | 'sports'
+  | 'technology';
+
+export const PAGE_SIZE = 10;

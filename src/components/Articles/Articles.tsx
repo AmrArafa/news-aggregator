@@ -1,39 +1,34 @@
 import { type ReactElement, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useDebounce } from '@uidotdev/usehooks';
-import {
-  getAllNewsFromNewsApi,
-  getTopHeadlinesFromNewsApi,
-} from './services/newsApi';
-import { NewsCard } from './components/NewsCard';
-import { NewsSearch } from './components/NewsSearch';
-import {
-  DateFilter,
-  CategoryFilter,
-  SourceFilter,
-} from './components/NewsFilters';
-import { getDefaultDateFrom, getDefaultDateTo } from './utils/dateUtils';
+import { getAllNewsFromNewsApi } from '../../services/newsApi';
+import { getDefaultDateFrom, getDefaultDateTo } from '../../utils/dateUtils';
+import { PAGE_SIZE } from '../../utils/constants';
+import { NewsCard } from '../NewsCard';
+import { NewsSearch } from '../NewsSearch';
+import { DateFilter, SourceFilter } from '../NewsFilters';
+import { Pagination } from '../Pagination';
 
-export function NewsAggregator(): ReactElement {
+export function Articles(): ReactElement {
   const defaultDateFrom = getDefaultDateFrom();
   const defaultDateTo = getDefaultDateTo();
 
   const [searchText, setSearchText] = useState('');
   const [dateFrom, setDateFrom] = useState(defaultDateFrom);
   const [dateTo, setDateTo] = useState(defaultDateTo);
-  const [category, setCategory] = useState('');
   const [selectedSourceIds, setSelectedSourceIds] = useState<string[]>([]);
   const [selectedSourceNames, setSelectedSourceNames] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const debouncedSearchText = useDebounce(searchText, 500);
 
   const canFetchAllArticles =
-    dateFrom !== '' && dateTo !== '' && debouncedSearchText !== '';
-
-  const canFetchTopHeadlines = selectedSourceIds.length === 0;
+    dateFrom !== '' &&
+    dateTo !== '' &&
+    (debouncedSearchText !== '' || selectedSourceIds.length > 0);
 
   const {
-    data: allArticles,
+    data: allArticlesData,
     isFetching: isFetchingAllArticles,
     isError: isArticlesError,
     error: articlesError,
@@ -44,54 +39,41 @@ export function NewsAggregator(): ReactElement {
       dateFrom,
       dateTo,
       selectedSourceIds,
+      currentPage,
     ],
     queryFn: () =>
       getAllNewsFromNewsApi({
+        page: currentPage,
+        pageSize: PAGE_SIZE,
         searchText: debouncedSearchText,
         dateFrom,
         dateTo,
         sources: selectedSourceIds.join(','),
       }),
-    select: (data) => data.articles,
     enabled: canFetchAllArticles,
     refetchOnWindowFocus: false,
   });
 
-  const {
-    data: topHeadlines,
-    isFetching: isFetchingTopHeadlines,
-    isError: isTopHeadlinesError,
-    error: topHeadlinesError,
-  } = useQuery({
-    queryKey: ['newsApiTopHeadlines', debouncedSearchText, category],
-    queryFn: () =>
-      getTopHeadlinesFromNewsApi({ searchText: debouncedSearchText, category }),
-    select: (data) => data.articles,
-    enabled: canFetchTopHeadlines,
-    refetchOnWindowFocus: false,
-  });
+  const isLoading = isFetchingAllArticles;
 
-  const isLoading = isFetchingAllArticles || isFetchingTopHeadlines;
-
-  const isEmpty =
-    !isLoading &&
-    allArticles?.length === 0 &&
-    (topHeadlines?.length === 0 || selectedSourceIds.length > 0);
+  const isEmpty = !isLoading && allArticlesData?.articles?.length === 0;
 
   const canShowArticles =
-    !isLoading && !isEmpty && allArticles && !isArticlesError;
+    !isLoading && !isEmpty && allArticlesData && !isArticlesError;
 
-  const canShowHeadlines =
-    !isLoading &&
-    !isEmpty &&
-    topHeadlines &&
-    selectedSourceIds.length === 0 &&
-    !isTopHeadlinesError;
+  const totalResults = allArticlesData?.totalResults ?? 0;
+
+  const showNote = searchText === '' && selectedSourceIds.length === 0;
 
   return (
-    <div className="p-5">
-      <h1 className="text-3xl text-center font-bold">News Aggregator</h1>
+    <div>
       <NewsSearch searchText={searchText} setSearchText={setSearchText} />
+      {showNote && (
+        <p className="text-sm mt-2 text-gray-400 italic">
+          Note: Please type a keyword in the search box or select a source to
+          display news.
+        </p>
+      )}
       <DateFilter
         dateFrom={dateFrom}
         setDateFrom={setDateFrom}
@@ -100,23 +82,16 @@ export function NewsAggregator(): ReactElement {
         defaultDateFrom={defaultDateFrom}
         defaultDateTo={defaultDateTo}
       />
-      <CategoryFilter setCategory={setCategory} />
       <SourceFilter
         selectedSourceNames={selectedSourceNames}
         setSelectedSourceNames={setSelectedSourceNames}
         selectedSourceIds={selectedSourceIds}
         setSelectedSourceIds={setSelectedSourceIds}
-        searchText={searchText}
       />
       {isLoading && <p className="text-lg text-center mt-4">Loading news...</p>}
       {isArticlesError && (
         <p className="text-lg text-red-500 text-center mt-4">
           Error: {articlesError.message}
-        </p>
-      )}
-      {isTopHeadlinesError && (
-        <p className="text-lg text-red-500 text-center mt-4">
-          Error: {topHeadlinesError.message}
         </p>
       )}
       {isEmpty && (
@@ -127,22 +102,17 @@ export function NewsAggregator(): ReactElement {
       )}
       {canShowArticles && (
         <div className="mt-5 grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {allArticles.map((article) => {
+          {allArticlesData.articles?.map((article) => {
             if (article.title === '[Removed]') return null;
             return <NewsCard key={article.title} article={article} />;
           })}
         </div>
       )}
-      {canShowHeadlines && (
-        <div className="mt-5 grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {topHeadlines.map((article) => {
-            if (article.title === '[Removed]') return null;
-            return <NewsCard key={article.title} article={article} />;
-          })}
-        </div>
-      )}
+      <Pagination
+        totalItems={totalResults}
+        currentPage={totalResults === 0 ? 0 : currentPage}
+        setCurrentPage={setCurrentPage}
+      />
     </div>
   );
 }
-
-export default NewsAggregator;

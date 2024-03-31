@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { NewsAggregator } from './NewsAggregator';
+import { NewsAggregator } from './pages';
 
 const queryClient = new QueryClient();
 
