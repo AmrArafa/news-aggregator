@@ -17,7 +17,7 @@ export function NewsAggregator(): ReactElement {
   const activeTabStyle = 'font-semibold underline';
 
   return (
-    <div className="p-5">
+    <div className="p-5 container mx-auto">
       <h1 className="text-3xl text-center font-bold">News Aggregator</h1>
       <div className="flex justify-center mt-4 divide-x divide-black text-lg">
         <button

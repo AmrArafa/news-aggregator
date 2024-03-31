@@ -14,13 +14,13 @@ export function NewsSearch({
   }
 
   return (
-    <form className="flex mt-4">
+    <form className="mt-4 sm:w-1/2 sm:mx-auto">
       <input
         type="search"
         placeholder="Search news..."
         onChange={handleSearchTextChange}
         value={searchText}
-        className="border rounded-md p-2 grow"
+        className="border rounded-md p-2 w-full"
       />
     </form>
   );

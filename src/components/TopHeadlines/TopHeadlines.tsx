@@ -50,6 +50,7 @@ export function TopHeadlines(): ReactElement {
   return (
     <div>
       <NewsSearch searchText={searchText} setSearchText={setSearchText} />
+      <h2 className="text-lg font-semibold mt-4">Filter:</h2>
       <CategoryFilter setCategory={setCategory} />
       {isLoading && <p className="text-lg text-center mt-4">Loading news...</p>}
       {isTopHeadlinesError && (
@@ -67,7 +68,7 @@ export function TopHeadlines(): ReactElement {
         <div className="mt-5 grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {topHeadlinesData.articles?.map((article) => {
             if (article.title === '[Removed]') return null;
-            return <NewsCard key={article.title} article={article} />;
+            return <NewsCard key={article.publishedAt} article={article} />;
           })}
         </div>
       )}

@@ -74,6 +74,7 @@ export function Articles(): ReactElement {
           display news.
         </p>
       )}
+      <h2 className="text-lg font-semibold mt-4">Filters:</h2>
       <DateFilter
         dateFrom={dateFrom}
         setDateFrom={setDateFrom}
@@ -101,10 +102,10 @@ export function Articles(): ReactElement {
         </p>
       )}
       {canShowArticles && (
-        <div className="mt-5 grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-5 grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {allArticlesData.articles?.map((article) => {
             if (article.title === '[Removed]') return null;
-            return <NewsCard key={article.title} article={article} />;
+            return <NewsCard key={article.publishedAt} article={article} />;
           })}
         </div>
       )}

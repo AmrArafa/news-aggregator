@@ -60,9 +60,9 @@ export function SourceFilter({
         <div className="mt-4">
           <p>Sources:</p>
           <form className="border rounded-md h-24 overflow-y-auto">
-            <fieldset className="p-2 disabled:bg-gray-200">
+            <fieldset className="p-2 disabled:bg-gray-200 sm:flex sm:flex-wrap sm:justify-between">
               {sources.map((source) => (
-                <div key={source.id} className="mt-1">
+                <div key={source.id} className="mt-1 sm:w-1/4">
                   <input
                     type="checkbox"
                     id={source.id}

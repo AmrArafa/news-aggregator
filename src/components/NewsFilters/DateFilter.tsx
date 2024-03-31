@@ -29,8 +29,7 @@ export function DateFilter({
 
   return (
     <div className="mt-4">
-      <h2 className="text-lg font-semibold mb-2">Filters:</h2>
-      <form className="flex justify-between items-center gap-1">
+      <form className="flex justify-between items-center sm:justify-normal sm:gap-4">
         <div>
           <label htmlFor="date-from">From:</label>
           <input
